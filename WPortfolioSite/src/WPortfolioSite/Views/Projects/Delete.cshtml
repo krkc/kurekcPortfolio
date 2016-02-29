@@ -1,0 +1,10 @@
+﻿@model WPortfolioSite.Models.Project
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2 class="page-header">Are you sure you wish to delete this file?</h2>
+<form asp-controller="Projects" asp-action="Delete">
+    <button name="id" value="@Model.ID" class="btn btn-danger">Confirm Delete</button>
+</form>

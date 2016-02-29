@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<h1 class="page-header">Project Portfolio&nbsp;<i class="fa fa-folder-open-o"></i></h1>
+
+<div class="row">
+    <div class="col-md-9">
+        <h4><span class="label label-primary">Featured Project:</span></h4>
+        <div id="FeaturedProject" class="jumbotron">
+            <h2><a href="http://ec2-54-213-201-76.us-west-2.compute.amazonaws.com:8080/" target="_blank">nLobby/Snake</a>&nbsp;&nbsp;<a href="https://github.com/krkc/nlobby"><i class="fa fa-github"></i></a></h2>
+            <span class="lead">HTML5 game lobby written in node.js with javascript Snake game</span><br /><br />
+            <div class="well text-info">Note: In order to play snake, two people must visit the game lobby. Once the other player appears under "Connected Users" you can click on their ID box to invite them to play.</div>
+            <span>Screenshot:</span>
+            <a href="http://ec2-54-213-201-76.us-west-2.compute.amazonaws.com:8080/" target="_blank"><img src="~/images/nlss.png" alt="Node.js Game Lobby" class="img-responsive img-rounded" /></a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <ul class="list-group">
+            <li class="list-group-item-heading">View <a asp-controller="Home" asp-action="Resume">Resume</a></li>
+            <li class="list-group-item-heading">View <a asp-controller="Projects" asp-action="Index">Featured Projects</a></li>
+            <li class="list-group-item-heading"><a asp-controller="Home" asp-action="Contact">Contact</a> Information</li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿@model WPortfolioSite.Models.Project
+
+@{
+    ViewData["Title"] = "Submit a New Project";
+}
+
+<h1 class="page-header">@ViewData["Title"]</h1>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ValidationSummary.All" class="alert-warning"></div>
+    @if (ViewData["ValidationMsg"] != null)
+    {
+        <span class="alert-warning">@ViewData["ValidationMsg"]</span>
+    }
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="alert-warning"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="alert-warning"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Language"></label>
+        <input asp-for="Language" class="form-control" />
+        <span asp-validation-for="Language" class="alert-warning"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Subtopic"></label>
+        <input asp-for="Subtopic" class="form-control" />
+        <span asp-validation-for="Subtopic" class="alert-warning"></span>
+    </div>
+
+    <div class="form-group" id="fnForm">
+        <label asp-for="ProjectFiles"></label>
+        <input asp-for="ProjectFiles[0].Filename" class="form-control" />
+        <span asp-validation-for="ProjectFiles" class="alert-warning"></span>
+    </div>
+
+    <a class="btn btn-info" onclick="addFile()">Add File</a>
+
+    <button class="btn btn-default" type="submit">Submit Project</button>
+</form>

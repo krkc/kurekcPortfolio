@@ -1,0 +1,210 @@
+﻿@model IEnumerable<WPortfolioSite.Models.Project>
+
+@{
+    ViewData["Title"] = "My Projects";
+
+    // Dictionary of Dictionaries of lists of new items
+    Dictionary<String, Dictionary<String, List<WPortfolioSite.Models.Project>>> languageDict = new Dictionary<string, Dictionary<string, List<WPortfolioSite.Models.Project>>>();
+
+    // Categorize data for more efficient access
+    if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            if (!languageDict.ContainsKey(item.Language))
+            {
+                // Add language to list
+
+                // List of items of new language and subtopic type
+                List<WPortfolioSite.Models.Project> projectList = new List<WPortfolioSite.Models.Project>();
+                projectList.Add(item);
+
+                // Dictionary of lists of items of new subtopic
+                Dictionary<String, List<WPortfolioSite.Models.Project>> subtopicDict = new Dictionary<String, List<WPortfolioSite.Models.Project>>();
+                if (item.Subtopic != null)
+                {
+                    subtopicDict.Add(item.Subtopic, projectList);
+                }
+                else
+                {
+                    subtopicDict.Add("NoSubtopicTestString", projectList);
+                }
+
+                // Add newly created dictionary to master language dictionary
+                languageDict.Add(item.Language, subtopicDict);
+            }
+            else
+            {
+                // Check for item subtopic
+                if (item.Subtopic != null)
+                {
+                    // Item has a subtopic
+                    // Check for subtopic in dictionary
+                    if (!languageDict[item.Language].ContainsKey(item.Subtopic))
+                    {
+                        // Language exists in dictionary, but not subtopic.
+                        // Add a new subtopic (list of projects) to the language dictionary
+                        languageDict[item.Language].Add(item.Subtopic, new List<WPortfolioSite.Models.Project>());
+                    }
+
+                    // Language and subtopic exist in dictionary. Add item.
+                    // Subtopic is in the dictionary, add item to that project list
+                    languageDict[item.Language][item.Subtopic].Add(item);
+                }
+                else
+                {
+                    // Item has no subtopic, use string indicating no subtopic
+                    if (!languageDict[item.Language].ContainsKey("NoSubtopicTestString"))
+                    {
+                        // Add a new subtopic (list of projects) to the language dictionary
+                        languageDict[item.Language].Add("NoSubtopicTestString", new List<WPortfolioSite.Models.Project>());
+                    }
+                    // Subtopic is in the dictionary, add item to that project list
+                    languageDict[item.Language]["NoSubtopicTestString"].Add(item);
+                }
+            }
+        }
+    }
+    // Increment a number to use as #Collapse class.
+    int collapseDivNumber = 1;
+}
+
+
+@* Begin View Content *@
+<div class="label label-default">Project Portfolio&nbsp;<i class="fa fa-folder-open-o"></i></div>
+
+@if ((string)ViewData["Dev"] == "true")
+{
+    <p class="h5">
+        <a asp-action="Create">Submit a new project</a>
+    </p>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h1 class="page-header">
+            Project Code&nbsp;<i class="fa fa-code"></i>
+        </h1>
+
+        @if (Model != null)
+        {
+            <div class="list-group">
+                @foreach (var language in languageDict)
+            {
+                string collapseDivId = "collapse" + collapseDivNumber++;
+
+                    <div class="list-group-item-heading btn-default" data-toggle="collapse" data-target="#@collapseDivId" href="#@collapseDivId">
+                        <span><i class="fa fa-minus-circle"></i> <strong><i>@Html.DisplayFor(modelItem => language.Key)</i></strong></span>
+                    </div>
+                    <div id="@collapseDivId" class="collapse in">
+                        <ul>
+                            @foreach (var subtopic in language.Value)
+                            {
+                                @if (subtopic.Key != "NoSubtopicTestString")
+                                {
+                                    <li>
+                                        @Html.DisplayFor(modelItem => subtopic.Key)
+                                        <ul>
+                                            @foreach (var item in subtopic.Value)
+                                            {
+                                                string filenamesanchor = "";
+                                                @foreach (var file in item.ProjectFiles)
+                                                {
+                                                    filenamesanchor += "<a href='#' onclick=populateModal('" + file.Filename + "') data-toggle='modal' data-target='#myModal'>" + file.Filename + "</a><br />";
+                                                }
+                                                <li>
+                                                    <a href="#" data-toggle="popover" data-trigger='focus' title="Files" data-content="@filenamesanchor">@Html.DisplayFor(modelItem => item.Title)</a>&nbsp;- @Html.DisplayFor(modelItem => item.Description)
+                                                    @if ((string)ViewData["Dev"] == "true")
+                                                    {
+                                                        <a asp-controller="Projects" asp-action="Delete" asp-route-id="@item.ID" class="btn btn-info btn-xs">Delete</a>
+                                                    }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    @foreach (var item in subtopic.Value)
+                                    {
+                                        string filenamesanchor = "";
+                                        @foreach (var file in item.ProjectFiles)
+                                        {
+                                            filenamesanchor += "<a href='#' onclick=populateModal('" + file.Filename + "') data-toggle='modal' data-target='#myModal'>" + file.Filename + "</a><br />";
+                                        }
+                                        <li>
+                                            <a href="#" data-toggle="popover" data-trigger='focus' title="Files" data-content="@filenamesanchor">@Html.DisplayFor(modelItem => item.Title)</a>&nbsp;- @Html.DisplayFor(modelItem => item.Description)
+                                            @if ((string)ViewData["Dev"] == "true")
+                                            {
+                                                <a asp-controller="Projects" asp-action="Delete" asp-route-id="@item.ID" class="btn btn-info btn-xs">Delete</a>
+                                            }
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+            <!-- Modal -->
+            <div id="myModal" class="modal fade modal-custom" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 id="fnameModal" class="modal-title">File name</h4>
+                        </div>
+                        <div class="modal-body">
+                            <pre><code id="srcprecode"></code></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End Modal -->
+        } @* End if *@
+    </div> <!-- End col-md-6 div -->
+    <div class="col-md-4">
+        <h1 class="page-header">
+            Demos&nbsp;<i class="fa fa-gears"></i>
+        </h1>
+        <div class="list-group">
+            @*<div class="list-group-item-heading btn-default" data-toggle="collapse" data-target="#demojsCollapse">JavaScript</div>
+            <div id="demojsCollapse" class="collapse">
+                <ul>
+                    <li><a href="#">ckSnake</a>&nbsp;- Snake game written in JS (2015)</li>
+                    <li><a href="#">ckPlatform</a>&nbsp;- Platform game written in JS (2014)</li>
+                    <li><a href="#">Responsive page</a>&nbsp;- Getting to know JS/CSS by implementing my own responsive scheme (2013)</li>
+                </ul>
+            </div>*@
+            <div class="list-group-item-heading btn-default" data-toggle="collapse" data-target="#demonodejsCollapse">
+                <span><i class="fa fa-minus-circle"></i> <strong><i>Node.js</i></strong></span>
+            </div>
+            <div id="demonodejsCollapse" class="collapse in">
+                <ul>
+                    <li>
+                        <div class="label label-info">Featured Project&nbsp;<i class="fa fa-star"></i></div>
+                        <a asp-controller="Projects" asp-action="Featured">nLobby</a>&nbsp;- A game lobby project written in node.js&nbsp;
+                        <a href="https://github.com/krkc/nlobby" target="_blank"><i class="fa fa-github"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="list-group-item-heading btn-default" data-toggle="collapse" data-target="#democsCollapse">
+                <span><i class="fa fa-minus-circle"></i> <strong><i>C#/ASP.NET</i></strong></span>
+            </div>
+            <div id="democsCollapse" class="collapse in">
+                <ul>
+                    <li>
+                        <a href="http://kurekc.dyndns.org:8080" target="_blank">WebForms Dictionary App</a>&nbsp;- Dictionary app running ASP.NET 4.5, using ADO.NET, web service.
+                    </li>
+                    <li>
+                        <a href="http://kurekc.dyndns.org">kurekc.dyndns.org Website</a>&nbsp;- MVC project running ASP.NET 5
+                        <a href="https://github.com/krkc/kurekcPortfolio" target="_blank"><i class="fa fa-github"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div> <!-- End col-md-4 div -->
+</div> <!-- End row div -->

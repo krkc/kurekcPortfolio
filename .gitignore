@@ -1,0 +1,6 @@
+# Ignore published build
+/WPortfolioSite/artifacts/bin/WPortfolioSite/Release
+# DB connection information shouldn't be public
+/WPortfolioSite/src/WPortfolioSite/appsettings.json
+# Source files could be school related, so shouldn't be visible to GitHub
+/WPortfolioSite/src/WPortfolioSite/wwwroot/pfiles
